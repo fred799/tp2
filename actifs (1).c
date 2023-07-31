@@ -15,7 +15,7 @@ struct t_actif{
 // Définition de la structure t_liste_passif
 struct t_liste_actif
 {
-    t_actif *actifs;
+    actif *actifs;
     int nombre_actifs;
 };
 
@@ -130,4 +130,77 @@ void tester_charger_actif() {
 
     // Libération de la mémoire allouée pour la liste des actifs
     free(liste_actifs);
+}
+
+char** obtenir_passifs_liés(Actif* liste_actifs, int indice_actif, int* nb_passifs_lies) {
+    // Vérifier si l'indice_actif est valide
+    if (indice_actif < 0 || indice_actif >= *nb_actifs) {
+        fprintf(stderr, "Indice d'actif invalide.\n");
+        *nb_passifs_lies = 0;
+        return NULL;
+    }
+
+    // Récupérer l'actif ciblé par l'indice
+    Actif actif_cible = liste_actifs[indice_actif];
+
+    // Compter le nombre de passifs liés
+    int nb_passifs = 0;
+    for (int i = 0; i < actif_cible.nbPassifsLies; i++) {
+        if (actif_cible.PassifsLies[i] != NULL) {
+            nb_passifs++;
+        }
+    }
+
+    // Allouer de la mémoire pour le tableau 2D des ID des passifs liés
+    char** passifs_lies = (char**)malloc(nb_passifs * sizeof(char*));
+
+    // Remplir le tableau 2D avec les ID des passifs liés
+    int index = 0;
+    for (int i = 0; i < actif_cible.nbPassifsLies; i++) {
+        if (actif_cible.PassifsLies[i] != NULL) {
+            passifs_lies[index] = strdup(actif_cible.PassifsLies[i]);
+            index++;
+        }
+    }
+
+    // Écrire le nombre de passifs liés dans la référence passée en paramètre
+    *nb_passifs_lies = nb_passifs;
+
+    return passifs_lies;
+}
+
+void test_obtenir_passifs_lies() {
+    int nb_actifs, nb_passifs;
+    Actif* liste_actifs = charger_actif("liste_actifs.txt", &nb_actifs);
+    char** liste_passifs = charger_passif("liste_passifs.txt", &nb_passifs);
+
+    // Exemple d'utilisation de la fonction obtenir_passifs_liés pour le premier actif (indice 0)
+    int nb_passifs_lies;
+    char** passifs_lies = obtenir_passifs_liés(liste_actifs, 0, &nb_passifs_lies);
+
+    // Afficher les passifs liés à l'actif ciblé
+    printf("Nombre de passifs liés : %d\n", nb_passifs_lies);
+    for (int i = 0; i < nb_passifs_lies; i++) {
+        printf("Passif lié %d : %s\n", i + 1, passifs_lies[i]);
+    }
+
+    // Libérer la mémoire allouée pour les passifs liés
+    for (int i = 0; i < nb_passifs_lies; i++) {
+        free(passifs_lies[i]);
+    }
+    free(passifs_lies);
+
+    // Libérer la mémoire allouée pour les actifs et les passifs
+    for (int i = 0; i < nb_actifs; i++) {
+        for (int j = 0; j < liste_actifs[i].nbPassifsLies; j++) {
+            free(liste_actifs[i].PassifsLies[j]);
+        }
+        free(liste_actifs[i].PassifsLies);
+    }
+    free(liste_actifs);
+
+    for (int i = 0; i < nb_passifs; i++) {
+        free(liste_passifs[i]);
+    }
+    free(liste_passifs);
 }
