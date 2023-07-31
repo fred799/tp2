@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "passifs.h"
-allo
+
 // Définition de la structure t_passif
 struct t_passif{
     char id[6];
