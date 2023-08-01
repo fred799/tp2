@@ -7,6 +7,6 @@ typedef struct t_liste_actifs liste_actifs;
 
 int nb_actif(Actif *liste_actifs[], int taille);
 
-
+void tester_nb_actif();
 
 #endif //TP2_ACTIFS_H
