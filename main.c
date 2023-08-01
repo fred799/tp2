@@ -1,11 +1,10 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdlib.h>
 
-int main() {
-    printf("Hello, World!\n");
-    return 0;
+int main(void) 
+{
+    
+    return EXIT_SUCCESS;
 }
-
-valeurpassifsliesactifs
-
-analyse_valeur_nette_totale
-nb_equites
