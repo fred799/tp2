@@ -112,3 +112,44 @@ void test_analyse_valeur_nette_totale() {
     free(equites->tableau);
     free(equites);
 }
+
+// Fonction pour compter le nombre de cases dans la liste d'équites
+int nb_equites(Equite* liste) {
+    int count = 0;
+    Equite* courant = liste;
+
+    while (courant != NULL) {
+        count++;
+        courant = courant->suivant;
+    }
+
+    return count;
+}
+
+// Procédure de test pour vérifier la fonction nb_equites
+void tester_nb_equites() {
+    // Création d'une liste d'équites pour les tests
+    Equite* equite1 = (Equite*)malloc(sizeof(Equite));
+    Equite* equite2 = (Equite*)malloc(sizeof(Equite));
+    Equite* equite3 = (Equite*)malloc(sizeof(Equite));
+
+    equite1->id = 1;
+    equite2->id = 2;
+    equite3->id = 3;
+
+    // Liaison des équites pour former une liste
+    equite1->suivant = equite2;
+    equite2->suivant = equite3;
+    equite3->suivant = NULL;
+
+    // Appel de la fonction à tester
+    int result = nb_equites(equite1);
+
+    // Affichage du résultat
+    printf("Nombre d'equites : %d\n", result);
+
+    // Libération de la mémoire allouée pour les équites
+    free(equite1);
+    free(equite2);
+    free(equite3);
+}
