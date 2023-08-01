@@ -1,0 +1,6 @@
+Types Actifs,Description
+1,valeur actuelle
+2,appréciation linéaire
+3,appréciation progressive
+4,dépréciation linéaire
+5,dépréciation progressive

@@ -1,0 +1,15 @@
+nb actifs : 13
+ID,Date,Description,Montant à Neuf,Pourcentage,Type,Passif lié
+a1,---,Compte Cheque,14821.65,0.00,1
+a2,---,REER,24198.64,0.00,1,p4
+a3,---,CELI no1,19491.80,0.00,1
+a14,---,CELI no2,6352.54,0.00,1,p9
+a5,---,Regime de pension agree,295865.54,0.00,1
+a6,2017,Maison,590000.00,0.06,3,p5,p6,p7
+a7,2018,Mobilier,41184.42,-0.04,4
+a8,2021,Vehicule,34765.40,-0.20,5,p8
+a9,2014,Velo no1,12218.00,-0.20,5
+a10,2019,Velo no2,12503.00,-0.20,5
+a11,---,Vetement,20000.00,0.00,1
+a12,---,Materiel electronique (Ordi; TV; Speaker; Cellulaire),12500.00,0.00,1
+a13,---,Materiel Sportif (hockey; golf; Tackx; Outdoor),10000.00,0.00,1

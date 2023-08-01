@@ -1,0 +1,11 @@
+nb passifs : 9
+ID,Description,Solde
+p1,Carte credit Mastercard,29.30
+p2,Carte credit Visa,1441.31
+p3,Marge credit personnelle MC1,35053.15
+p5,Hypotheque,469351.71
+p6,Marge credit hypothecaire1,47047.77
+p7,Marge credit hypothecaire2,35045.45
+p8,Solde location voiture,22666.18
+p9,Dettes personnelles - parents,25500.00
+p4,Pret REER/CELI,19690.73
