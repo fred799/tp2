@@ -13,7 +13,7 @@ struct t_passif{
 // Définition de la structure t_liste_passif
 struct t_liste_passif
 {
-    t_passif *passifs;
+    passif *passifs;
     int nombre_passifs;
 };
 
