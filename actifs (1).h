@@ -11,5 +11,6 @@ char** obtenir_passifs_liés(Actif* liste_actifs, int indice_actif, int* nb_pass
 
 void tester_nb_actif();
 void tester_charger_actif();
+void test_obtenir_passifs_lies();
 
 #endif //TP2_ACTIFS_H
