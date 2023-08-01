@@ -13,11 +13,10 @@ struct t_actifs{
 };
 
 // Définition de la structure t_liste_passif
-struct t_liste_actif
-{
-    actif *actifs;
-    int nombre_actifs;
-};
+struct t_liste_actifs{
+    actifs* tableau;
+    int nombre_cases;
+} ;
 
 // Fonction pour compter le nombre d'éléments actifs dans la liste
 int nb_actif(Actif *liste_actifs[], int taille) {
