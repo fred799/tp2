@@ -204,3 +204,69 @@ void test_obtenir_passifs_lies() {
     }
     free(liste_passifs);
 }
+
+// Fonction qui calcule la somme des dettes passives reliées à un actif
+float valeur_passifs_lier_actif(Actif *actifs, int indice_actif) {
+    float somme_passifs = 0.0;
+    
+    // Vérification des paramètres
+    if (actifs == NULL || indice_actif < 0) {
+        printf("Erreur: Paramètres invalides.\n");
+        return somme_passifs;
+    }
+
+    // Vérification que l'indice de l'actif est valide
+    if (indice_actif >= actifs->nb_passifs) {
+        printf("Erreur: Indice de l'actif invalide.\n");
+        return somme_passifs;
+    }
+
+    // Récupération de l'actif à analyser
+    Actif actif_analyser = actifs[indice_actif];
+
+    // Parcours des passifs reliés à l'actif
+    for (int i = 0; i < actif_analyser.nb_passifs; i++) {
+        // Recherche de l'indice du passif en fonction de sa description
+        int indice_passif = -1;
+        for (int j = 0; j < actif_analyser.nb_passifs; j++) {
+            if (strcmp(actif_analyser.passifs[j].description, actif_analyser.passifs[i].description) == 0) {
+                indice_passif = j;
+                break;
+            }
+        }
+
+        // Si l'indice du passif est trouvé, on accumule sa valeur dans la somme
+        if (indice_passif != -1) {
+            somme_passifs += actif_analyser.passifs[indice_passif].valeur;
+        }
+    }
+
+    return somme_passifs;
+}
+
+// Procédure de test
+void test_valeur_passifs_lier_actif() {
+    // Création des passifs
+    Passif passif1 = { "Passif 1", 100.0 };
+    Passif passif2 = { "Passif 2", 200.0 };
+    Passif passif3 = { "Passif 1", 50.0 };  // Même description que passif1
+    Passif passif4 = { "Passif 3", 300.0 };
+
+    // Création des actifs et leurs passifs respectifs
+    Passif passifs_actif1[] = { passif1, passif2 };
+    Actif actif1 = { "Actif 1", passifs_actif1, 2 };
+
+    Passif passifs_actif2[] = { passif3, passif4 };
+    Actif actif2 = { "Actif 2", passifs_actif2, 2 };
+
+    Actif actifs[] = { actif1, actif2 };
+
+    // Test de la fonction avec l'actif1 (doit retourner 300.0)
+    float somme_passifs_actif1 = valeur_passifs_lier_actif(actifs, 0);
+    printf("Somme des passifs reliés à l'actif 1 : %.2f\n", somme_passifs_actif1);
+
+    // Test de la fonction avec l'actif2 (doit retourner 350.0)
+    float somme_passifs_actif2 = valeur_passifs_lier_actif(actifs, 1);
+    printf("Somme des passifs reliés à l'actif 2 : %.2f\n", somme_passifs_actif2);
+}
+
