@@ -1,15 +1,15 @@
 #include "actifs.h"
 
 // Définition de la structure t_passif
-struct t_actif{
+struct t_actifs{
     char id[6];
-    int date;
+    int annee;
     char description[51];
-    float prix_a_neuf;
-    float appreciation;
-    int
-    int
-
+    double valeur_init;
+    double pourcent_app;
+    int typ_app;
+    int nbr_passifs;
+    char** passifs_lies;
 };
 
 // Définition de la structure t_liste_passif
