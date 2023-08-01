@@ -13,5 +13,6 @@ float valeur_passifs_lier_actif(Actif *actifs, int indice_actif);
 void tester_nb_actif();
 void tester_charger_actif();
 void test_obtenir_passifs_lies();
+void test_valeur_passifs_lier_actif();
 
 #endif //TP2_ACTIFS_H
