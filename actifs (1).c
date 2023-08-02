@@ -269,6 +269,50 @@ void test_valeur_passifs_lier_actif() {
     printf("Somme des passifs reliés à l'actif 2 : %.2f\n", somme_passifs_actif2);
 }
 
+// Fonction pour modifier la valeur d'un passif dans la liste d'actifs
+void modifier_solde_actif(liste_actifs* liste, int indice_passif, double nouvelle_valeur) {
+    if (liste == NULL || indice_passif < 0 || indice_passif >= liste->nombre_cases) {
+        printf("Erreur : indice_passif invalide ou liste NULL.\n");
+        return;
+    }
+
+    // Modification de la valeur du passif ciblé par l'indice reçu en paramètre
+    liste->tableau[indice_passif].valeur_init = nouvelle_valeur;
+}
+
+// Procédure de test pour la fonction modifier_solde_actif
+void tester_modifier_solde_actif() {
+    // Création d'une liste d'actifs de test
+    actifs actif1 = { "A001", 2023, "Description actif 1", 1000.0, 50.0, 1, 2 };
+    char* passifs_actif1[] = { "Passif1", "Passif2" };
+    actif1.passifs_lies = passifs_actif1;
+
+    actifs actif2 = { "A002", 2023, "Description actif 2", 2000.0, 30.0, 2, 1 };
+    char* passifs_actif2[] = { "Passif3" };
+    actif2.passifs_lies = passifs_actif2;
+
+    actifs actif3 = { "A003", 2023, "Description actif 3", 3000.0, 20.0, 3, 0 };
+    actif3.passifs_lies = NULL;
+
+    actifs liste_actifs[] = { actif1, actif2, actif3 };
+    liste_actifs liste = { liste_actifs, 3 };
+
+    // Affichage des actifs avant modification
+    printf("Avant modification :\n");
+    for (int i = 0; i < liste.nombre_cases; i++) {
+        printf("Actif %d - Description : %s, Valeur initiale : %.2lf\n", i+1, liste.tableau[i].description, liste.tableau[i].valeur_init);
+    }
+
+    // Test de modification du solde du premier actif
+    modifier_solde_actif(&liste, 0, 1500.0);
+
+    // Affichage des actifs après modification
+    printf("\nAprès modification :\n");
+    for (int i = 0; i < liste.nombre_cases; i++) {
+        printf("Actif %d - Description : %s, Valeur initiale : %.2lf\n", i+1, liste.tableau[i].description, liste.tableau[i].valeur_init);
+    }
+}
+
 void test_module_actif()
 {
     
