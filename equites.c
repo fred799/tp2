@@ -154,7 +154,7 @@ void tester_nb_equites() {
     free(equite3);
 }
 
-void enregistrer_analyser_valeur_nette(struct t_liste_equite* liste, const char* nom_fichier) {
+void enregistrer_analyser_valeur_nette(liste_equite* liste, const char* nom_fichier) {
     // Ouverture du fichier en écriture
     FILE* fichier = fopen(nom_fichier, "w");
     
@@ -184,14 +184,14 @@ void enregistrer_analyser_valeur_nette(struct t_liste_equite* liste, const char*
 
 void test_enregistrer_analyser_valeur_nette() {
     // Création d'un exemple de liste d'équités
-    struct t_equite eq1 = { "EQ001", "Equité 1", 1500.0 };
-    struct t_equite eq2 = { "EQ002", "Equité 2", 2200.0 };
-    struct t_equite eq3 = { "EQ003", "Equité 3", 1800.0 };
-    struct t_equite eq4 = { "EQ004", "Equité 4", 3000.0 };
+    equite eq1 = { "EQ001", "Equité 1", 1500.0 };
+    equite eq2 = { "EQ002", "Equité 2", 2200.0 };
+    equite eq3 = { "EQ003", "Equité 3", 1800.0 };
+    equite eq4 = { "EQ004", "Equité 4", 3000.0 };
 
-    struct t_liste_equite liste_eq;
+    liste_equite liste_eq;
     liste_eq.nbr_case = 4;
-    liste_eq.tableau = (struct t_equite*)malloc(liste_eq.nbr_case * sizeof(struct t_equite));
+    liste_eq.tableau = (equite*)malloc(liste_eq.nbr_case * sizeof(equite));
     
     if (liste_eq.tableau == NULL) {
         printf("Erreur : Impossible d'allouer de la mémoire pour la liste d'équités\n");
