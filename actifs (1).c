@@ -269,3 +269,7 @@ void test_valeur_passifs_lier_actif() {
     printf("Somme des passifs reliés à l'actif 2 : %.2f\n", somme_passifs_actif2);
 }
 
+void test_module_actif()
+{
+    
+}
