@@ -114,6 +114,55 @@ void tester_charger_passif() {
     }
 }
 
+// Fonction pour modifier le solde d'un passif en fonction de son indice
+void modifier_solde_passif(struct t_liste_passif *liste, int indice_passif, float nouvelle_valeur) {
+    if (liste == NULL || indice_passif < 0 || indice_passif >= liste->nombre_passifs) {
+        printf("Erreur : Indice de passif invalide.\n");
+        return;
+    }
+
+    liste->passifs[indice_passif].solde = nouvelle_valeur;
+}
+
+// Procédure de test pour la fonction modifier_solde_passif
+void test_modifier_solde_passif() {
+    // Création de la liste de passifs de test
+    struct t_passif passifs_test[] = {
+        {"P001", "Passif 1", 1000.0},
+        {"P002", "Passif 2", 1500.0},
+        {"P003", "Passif 3", 2000.0},
+        // Vous pouvez ajouter plus de passifs de test ici si nécessaire
+    };
+    int nombre_passifs_test = sizeof(passifs_test) / sizeof(passifs_test[0]);
+
+    struct t_liste_passif liste_test;
+    liste_test.passifs = passifs_test;
+    liste_test.nombre_passifs = nombre_passifs_test;
+
+    // Affichage des passifs avant modification
+    printf("Passifs avant modification :\n");
+    for (int i = 0; i < liste_test.nombre_passifs; i++) {
+        printf("ID: %s, Description: %s, Solde: %.2f\n",
+               liste_test.passifs[i].id,
+               liste_test.passifs[i].description,
+               liste_test.passifs[i].solde);
+    }
+
+    // Test de la fonction modifier_solde_passif pour modifier le passif à l'indice 1
+    int indice_passif_a_modifier = 1;
+    float nouvelle_valeur_passif = 1800.0;
+    modifier_solde_passif(&liste_test, indice_passif_a_modifier, nouvelle_valeur_passif);
+
+    // Affichage des passifs après modification
+    printf("\nPassifs après modification :\n");
+    for (int i = 0; i < liste_test.nombre_passifs; i++) {
+        printf("ID: %s, Description: %s, Solde: %.2f\n",
+               liste_test.passifs[i].id,
+               liste_test.passifs[i].description,
+               liste_test.passifs[i].solde);
+    }
+}
+
 void test_module_passifs()
 {
     
