@@ -154,6 +154,62 @@ void tester_nb_equites() {
     free(equite3);
 }
 
+void enregistrer_analyser_valeur_nette(struct t_liste_equite* liste, const char* nom_fichier) {
+    // Ouverture du fichier en écriture
+    FILE* fichier = fopen(nom_fichier, "w");
+    
+    if (fichier == NULL) {
+        printf("Erreur : Impossible d'ouvrir le fichier %s\n", nom_fichier);
+        return;
+    }
+
+    // Écriture de la valeur nette totale sur la première ligne
+    double valeur_totale = 0.0;
+    for (int i = 0; i < liste->nbr_case; i++) {
+        valeur_totale += liste->tableau[i].val_net;
+    }
+    fprintf(fichier, "Valeur nette totale: %.2f\n", valeur_totale);
+
+    // Écriture de l'entête sur la troisième ligne
+    fprintf(fichier, "ID\tDescription\tValeur\n");
+
+    // Écriture des équités sur les lignes subséquentes
+    for (int i = 0; i < liste->nbr_case; i++) {
+        fprintf(fichier, "%s\t%s\t%.2f\n", liste->tableau[i].cle_unique, liste->tableau[i].description, liste->tableau[i].val_net);
+    }
+
+    // Fermeture du fichier
+    fclose(fichier);
+}
+
+void test_enregistrer_analyser_valeur_nette() {
+    // Création d'un exemple de liste d'équités
+    struct t_equite eq1 = { "EQ001", "Equité 1", 1500.0 };
+    struct t_equite eq2 = { "EQ002", "Equité 2", 2200.0 };
+    struct t_equite eq3 = { "EQ003", "Equité 3", 1800.0 };
+    struct t_equite eq4 = { "EQ004", "Equité 4", 3000.0 };
+
+    struct t_liste_equite liste_eq;
+    liste_eq.nbr_case = 4;
+    liste_eq.tableau = (struct t_equite*)malloc(liste_eq.nbr_case * sizeof(struct t_equite));
+    
+    if (liste_eq.tableau == NULL) {
+        printf("Erreur : Impossible d'allouer de la mémoire pour la liste d'équités\n");
+        return;
+    }
+
+    liste_eq.tableau[0] = eq1;
+    liste_eq.tableau[1] = eq2;
+    liste_eq.tableau[2] = eq3;
+    liste_eq.tableau[3] = eq4;
+
+    // Appel de la fonction pour enregistrer les résultats dans un fichier
+    enregistrer_analyser_valeur_nette(&liste_eq, "resultats_equites.txt");
+
+    // Libération de la mémoire allouée pour la liste d'équités
+    free(liste_eq.tableau);
+}
+
 void test_module_equite()
 {
     
