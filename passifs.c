@@ -114,7 +114,10 @@ void tester_charger_passif() {
     }
 }
 
-#endif // PASSIFS_H
+void test_module_passifs()
+{
+    
+}
 
 
 
