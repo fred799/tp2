@@ -153,3 +153,8 @@ void tester_nb_equites() {
     free(equite2);
     free(equite3);
 }
+
+void test_module_equite()
+{
+    
+}
