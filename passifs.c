@@ -97,6 +97,7 @@ ListePassifs* charger_passif(const char* nom_fichier) {
     return liste;
 }
 
+
 // Procédure de test pour afficher les passifs
 void tester_charger_passif() {
     const char* nom_fichier = "liste_passifs.txt";
@@ -123,6 +124,27 @@ void modifier_solde_passif(struct t_liste_passif *liste, int indice_passif, floa
 
     liste->passifs[indice_passif].solde = nouvelle_valeur;
 }
+// Fonction pour trouver l'indice du passif avec l'id donné dans la liste
+int trouver_indice_passif(const t_liste_passif* liste, const char* id_passif) {
+    for (int i = 0; i < liste->nombrePassifs; i++) {
+        if (strcmp(liste->tableau[i].id, id_passif) == 0) {
+            return i; // Indice trouvé
+        }
+    }
+    return -1; // Indice non trouvé (valeur -1 indique l'absence du passif dans la liste)
+}
+
+ 
+
+// Fonction pour libérer la mémoire occupée par la liste de passifs
+void detruire_liste_passif(t_liste_passif* liste) {
+    free(liste->tableau);
+    liste->tableau = NULL;
+    liste->nombrePassifs = 0;
+    free(liste);
+}
+
+ 
 
 // Procédure de test pour la fonction modifier_solde_passif
 void test_modifier_solde_passif() {
