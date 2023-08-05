@@ -322,3 +322,27 @@ void test_module_actif_p2()
 {
     
 }
+// Donction pour trouver l'indice de l'actif avec l'id donné dans la liste
+int trouver_indice_actif(const t_liste_actif* liste, const char* id_actif) {
+    for (int i = 0; i < liste->nombreActifs; i++) {
+        if (strcmp(liste->tableau[i].id, id_actif) == 0) {
+            return i; // Indice trouvé
+        }
+    }
+    return -1; // Indice non trouvé (valeur -1 indique l'absence de l'actif dans la liste)
+}
+
+// Fonction pour libérer la mémoire occupée par la liste d'actifs
+void detruire_liste_actif(t_liste_actif* liste) {
+    for (int i = 0; i < liste->nombreActifs; i++) {
+        for (int j = 0; j < liste->tableau[i].nombrePassifs; j++) {
+            free(liste->tableau[i].passifsRelies[j]);
+        }
+        free(liste->tableau[i].passifsRelies);
+    }
+    free(liste->tableau);
+    liste->tableau = NULL;
+    liste->nombreActifs = 0;
+    free(liste);
+}
+ 
