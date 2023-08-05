@@ -12,7 +12,7 @@ struct t_equite {
     double val_net;
 };
 
-struct liste_equite {
+struct t_liste_equite {
     equite* tableau;
     int nbr_case;
 };
@@ -20,7 +20,7 @@ struct liste_equite {
 // Fonction pour analyser la valeur nette totale
 liste_equite* analyse_valeur_nette_totale(equite* actifs, int nbr_actifs, equite* passifs, int nbr_passifs) {
     // Allocation de mémoire pour la liste des équités à retourner
-    struct liste_equite* equites = (struct liste_equite*)malloc(sizeof(struct liste_equite));
+    liste_equite* equites = (liste_equite*)malloc(sizeof(liste_equite));
     if (equites == NULL) {
         perror("Erreur d'allocation de mémoire");
         exit(EXIT_FAILURE);
@@ -36,7 +36,7 @@ liste_equite* analyse_valeur_nette_totale(equite* actifs, int nbr_actifs, equite
         double valeur_net_actif = actifs[i].val_net;
 
         // Ajout de l'équité représentant cet actif à la liste des équités
-        equites->tableau = (struct t_equite*)realloc(equites->tableau, (equites->nbr_case + 1) * sizeof(struct t_equite));
+        equites->tableau = (t_equite*)realloc(equites->tableau, (equites->nbr_case + 1) * sizeof(t_equite));
         if (equites->tableau == NULL) {
             perror("Erreur d'allocation de mémoire");
             exit(EXIT_FAILURE);
@@ -63,7 +63,7 @@ liste_equite* analyse_valeur_nette_totale(equite* actifs, int nbr_actifs, equite
 
         // Si le passif actuel n'est pas lié à un actif, l'ajouter à la liste des équités
         if (!lien_actif_trouve) {
-            equites->tableau = (struct t_equite*)realloc(equites->tableau, (equites->nbr_case + 1) * sizeof(struct t_equite));
+            equites->tableau = (t_equite*)realloc(equites->tableau, (equites->nbr_case + 1) * sizeof(t_equite));
             if (equites->tableau == NULL) {
                 perror("Erreur d'allocation de mémoire");
                 exit(EXIT_FAILURE);
@@ -83,23 +83,23 @@ liste_equite* analyse_valeur_nette_totale(equite* actifs, int nbr_actifs, equite
 // Procédure de test
 void test_analyse_valeur_nette_totale() {
     // Exemple de données pour les actifs
-    struct t_equite actifs[] = {
+    t_equite actifs[] = {
         { "A001", "Actif 1", 1000 },
         { "A002", "Actif 2", 2000 },
         // ... Ajouter plus d'actifs si nécessaire
     };
-    int nbr_actifs = sizeof(actifs) / sizeof(struct t_equite);
+    int nbr_actifs = sizeof(actifs) / sizeof(t_equite);
 
     // Exemple de données pour les passifs
-    struct t_equite passifs[] = {
+    t_equite passifs[] = {
         { "P001", "Passif 1", 500 },
         { "A002", "Actif 2", 1000 }, // Passif lié à un actif
         // ... Ajouter plus de passifs si nécessaire
     };
-    int nbr_passifs = sizeof(passifs) / sizeof(struct t_equite);
+    int nbr_passifs = sizeof(passifs) / sizeof(t_equite);
 
     // Appel de la fonction d'analyse
-    struct liste_equite* equites = analyse_valeur_nette_totale(actifs, nbr_actifs, passifs, nbr_passifs);
+    liste_equite* equites = analyse_valeur_nette_totale(actifs, nbr_actifs, passifs, nbr_passifs);
 
     // Affichage des équités résultantes
     printf("Liste des équités :\n");
