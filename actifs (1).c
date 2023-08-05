@@ -19,11 +19,11 @@ struct t_liste_actifs{
 } ;
 
 // Fonction pour compter le nombre d'éléments actifs dans la liste
-int nb_actif(Actif *liste_actifs[], int taille) {
+int nb_actif(t_liste_actifs liste) {
     int nb_elements_actifs = 0;
 
-    for (int i = 0; i < taille; i++) {
-        if (liste_actifs[i] != NULL) {
+    for (int i = 0; i < liste.nombre_cases; i++) {
+        if (liste.tableau[i].id[0] != '\0') {
             nb_elements_actifs++;
         }
     }
@@ -33,7 +33,7 @@ int nb_actif(Actif *liste_actifs[], int taille) {
 
 // Procédure de test pour vérifier la fonction nb_actif
 void tester_nb_actif() {
-    FILE *fichier = fopen("liste_actifs.txt", "r");
+    FILE* fichier = fopen("liste_actifs.txt", "r");
     if (fichier == NULL) {
         printf("Erreur lors de l'ouverture du fichier.\n");
         return;
@@ -43,121 +43,172 @@ void tester_nb_actif() {
     int nb_actifs;
     fscanf(fichier, "nb actifs : %d\n", &nb_actifs);
 
-    // Allouer de la mémoire pour le tableau de pointeurs vers les actifs
-    Actif **liste_actifs = (Actif **)malloc(nb_actifs * sizeof(Actif *));
+    // Allouer de la mémoire pour le tableau de structures d'actifs
+    t_liste_actifs liste_actifs;
+    liste_actifs.tableau = (actifs*)malloc(nb_actifs * sizeof(actifs));
 
     // Lire les données des actifs à partir du fichier et les stocker dans le tableau
     for (int i = 0; i < nb_actifs; i++) {
-        liste_actifs[i] = (Actif *)malloc(sizeof(Actif));
-        fscanf(fichier, "%[^,],%[^,],%[^,],%f,%f,%d,%[^\n]\n",
-               liste_actifs[i]->ID, liste_actifs[i]->Date, liste_actifs[i]->Description,
-               &liste_actifs[i]->MontantNeuf, &liste_actifs[i]->Pourcentage,
-               &liste_actifs[i]->Type, liste_actifs[i]->PassifLie);
+        fscanf(fichier, "%[^,],%d,%[^,],%lf,%lf,%d,%d",
+               liste_actifs.tableau[i].id, &liste_actifs.tableau[i].annee,
+               liste_actifs.tableau[i].description, &liste_actifs.tableau[i].valeur_init,
+               &liste_actifs.tableau[i].pourcentage, &liste_actifs.tableau[i].type,
+               &liste_actifs.tableau[i].nbr_passifs);
+
+        if (liste_actifs.tableau[i].nbr_passifs > 0) {
+            liste_actifs.tableau[i].passifs_lies = (char**)malloc(liste_actifs.tableau[i].nbr_passifs * sizeof(char*));
+            for (int j = 0; j < liste_actifs.tableau[i].nbr_passifs; j++) {
+                liste_actifs.tableau[i].passifs_lies[j] = (char*)malloc(3 * sizeof(char));
+                fscanf(fichier, ",%[^,\n]", liste_actifs.tableau[i].passifs_lies[j]);
+            }
+        }
     }
 
     // Fermer le fichier après avoir lu les données
     fclose(fichier);
 
+    // Initialiser le nombre de cases dans la structure de liste_actifs
+    liste_actifs.nombre_cases = nb_actifs;
+
     // Appeler la fonction nb_actif pour obtenir le nombre d'éléments actifs dans la liste
-    int nombre_elements_actifs = nb_actif(liste_actifs, nb_actifs);
+    int nombre_elements_actifs = nb_actif(liste_actifs);
 
     // Afficher le résultat
     printf("Nombre d'elements actifs : %d\n", nombre_elements_actifs);
 
-    // Libérer la mémoire allouée pour les actifs
-    for (int i = 0; i < nb_actifs; i++) {
-        free(liste_actifs[i]);
+    // Libérer la mémoire allouée pour les passifs
+    for (int i = 0; i < liste_actifs.nombre_cases; i++) {
+        for (int j = 0; j < liste_actifs.tableau[i].nbr_passifs; j++) {
+            free(liste_actifs.tableau[i].passifs_lies[j]);
+        }
+        if (liste_actifs.tableau[i].nbr_passifs > 0) {
+            free(liste_actifs.tableau[i].passifs_lies);
+        }
     }
-    free(liste_actifs);
+
+    // Libérer la mémoire allouée pour les actifs
+    free(liste_actifs.tableau);
 }
 
 // Fonction pour charger les actifs à partir du fichier
-Actif* charger_actif(const char* nom_fichier) {
+t_liste_actifs charger_actif(const char* nom_fichier) {
+    struct t_liste_actifs liste_actifs;
+
     FILE* fichier = fopen(nom_fichier, "r");
     if (fichier == NULL) {
         printf("Erreur lors de l'ouverture du fichier.\n");
-        return NULL;
+        liste_actifs.tableau = NULL;
+        liste_actifs.nombre_cases = 0;
+        return liste_actifs;
     }
 
     // Lecture du nombre d'actifs inscrits dans le fichier
     int nb_actifs;
     fscanf(fichier, "nb actifs : %d\n", &nb_actifs);
 
-    // Création du tableau dynamique pour stocker les actifs
-    Actif* liste_actifs = (Actif*)malloc(nb_actifs * sizeof(Actif));
+    // Allocation de mémoire pour le tableau d'actifs
+    liste_actifs.tableau = (actifs*)malloc(nb_actifs * sizeof(actifs));
+    liste_actifs.nombre_cases = nb_actifs;
 
     // Chargement des données depuis le fichier dans le tableau
     for (int i = 0; i < nb_actifs; i++) {
-        fscanf(fichier, "%[^,],%[^,],%[^,],%lf,%lf,%d,%[^\n]\n",
-               liste_actifs[i].ID,
-               liste_actifs[i].Date,
-               liste_actifs[i].Description,
-               &liste_actifs[i].MontantNeuf,
-               &liste_actifs[i].Pourcentage,
-               &liste_actifs[i].Type,
-               liste_actifs[i].PassifLie
+        actifs* actif = &liste_actifs.tableau[i];
+        fscanf(fichier, "%5[^,],%d,%50[^,],%lf,%lf,%d,%d",
+               actif->id,
+               &actif->annee,
+               actif->description,
+               &actif->valeur_init,
+               &actif->pourcentage,
+               &actif->type,
+               &actif->nbr_passifs
         );
+
+        // Allocation de mémoire pour les passifs liés
+        actif->passifs_lies = (char**)malloc(actif->nbr_passifs * sizeof(char*));
+
+        // Lecture des passifs liés
+        for (int j = 0; j < actif->nbr_passifs; j++) {
+            actif->passifs_lies[j] = (char*)malloc(3 * sizeof(char));
+            fscanf(fichier, ",%2[^,\n]", actif->passifs_lies[j]);
+        }
+        fscanf(fichier, "\n"); // Lire le saut de ligne restant
     }
 
     fclose(fichier);
     return liste_actifs;
 }
 
+// Procédure de libération de mémoire
+void liberer_liste_actifs(struct t_liste_actifs* liste) {
+    for (int i = 0; i < liste->nombre_cases; i++) {
+        struct t_actifs* actif = &liste->tableau[i];
+        for (int j = 0; j < actif->nbr_passifs; j++) {
+            free(actif->passifs_lies[j]);
+        }
+        free(actif->passifs_lies);
+    }
+    free(liste->tableau);
+}
+
 // Procédure de test
 void tester_charger_actif() {
     const char* nom_fichier = "liste_actifs.txt";
-    Actif* liste_actifs = charger_actif(nom_fichier);
-    if (liste_actifs == NULL) {
+    struct t_liste_actifs liste_actifs = charger_actif(nom_fichier);
+    if (liste_actifs.tableau == NULL) {
         printf("Le chargement des actifs a échoué.\n");
         return;
     }
 
     // Affichage des actifs chargés pour vérification
     printf("Actifs chargés : \n");
-    int nb_actifs = sizeof(liste_actifs) / sizeof(Actif);
-    for (int i = 0; i < nb_actifs; i++) {
-        printf("ID: %s, Date: %s, Description: %s, MontantNeuf: %.2f, Pourcentage: %.2f, Type: %d, PassifLie: %s\n",
-               liste_actifs[i].ID,
-               liste_actifs[i].Date,
-               liste_actifs[i].Description,
-               liste_actifs[i].MontantNeuf,
-               liste_actifs[i].Pourcentage,
-               liste_actifs[i].Type,
-               liste_actifs[i].PassifLie
+    for (int i = 0; i < liste_actifs.nombre_cases; i++) {
+        struct t_actifs* actif = &liste_actifs.tableau[i];
+        printf("ID: %s, Année: %d, Description: %s, ValeurInit: %.2f, Pourcentage: %.2f, Type: %d, NbrPassifs: %d, PassifsLiés: ",
+               actif->id,
+               actif->annee,
+               actif->description,
+               actif->valeur_init,
+               actif->pourcentage,
+               actif->type,
+               actif->nbr_passifs
         );
+        for (int j = 0; j < actif->nbr_passifs; j++) {
+            printf("%s ", actif->passifs_lies[j]);
+        }
+        printf("\n");
     }
 
-    // Libération de la mémoire allouée pour la liste des actifs
-    free(liste_actifs);
+    // Libération de la mémoire allouée
+    liberer_liste_actifs(&liste_actifs);
 }
 
-char** obtenir_passifs_liés(Actif* liste_actifs, int indice_actif, int* nb_passifs_lies) {
+char** obtenir_passifs_lies(actifs* liste_actifs, int indice_actif, int* nb_passifs_lies) {
     // Vérifier si l'indice_actif est valide
-    if (indice_actif < 0 || indice_actif >= *nb_actifs) {
+    if (indice_actif < 0 || indice_actif >= liste_actifs->nombre_cases) {
         fprintf(stderr, "Indice d'actif invalide.\n");
         *nb_passifs_lies = 0;
         return NULL;
     }
 
     // Récupérer l'actif ciblé par l'indice
-    Actif actif_cible = liste_actifs[indice_actif];
+    actifs* actif_cible = liste_actifs->tableau[indice_actif];
 
     // Compter le nombre de passifs liés
     int nb_passifs = 0;
-    for (int i = 0; i < actif_cible.nbPassifsLies; i++) {
-        if (actif_cible.PassifsLies[i] != NULL) {
+    for (int i = 0; i < actif_cible.nbr_passifs; i++) {
+        if (actif_cible.passifs_lies[i] != NULL) {
             nb_passifs++;
         }
     }
 
-    // Allouer de la mémoire pour le tableau 2D des ID des passifs liés
+    // Allouer de la mémoire pour le tableau des ID des passifs liés
     char** passifs_lies = (char**)malloc(nb_passifs * sizeof(char*));
 
-    // Remplir le tableau 2D avec les ID des passifs liés
+    // Remplir le tableau avec les ID des passifs liés
     int index = 0;
-    for (int i = 0; i < actif_cible.nbPassifsLies; i++) {
-        if (actif_cible.PassifsLies[i] != NULL) {
-            passifs_lies[index] = strdup(actif_cible.PassifsLies[i]);
+    for (int i = 0; i < actif_cible.nbr_passifs; i++) {
+        if (actif_cible.passifs_lies[i] != NULL) {
+            passifs_lies[index] = strdup(actif_cible.passifs_lies[i]);
             index++;
         }
     }
@@ -169,13 +220,14 @@ char** obtenir_passifs_liés(Actif* liste_actifs, int indice_actif, int* nb_pass
 }
 
 void test_obtenir_passifs_lies() {
-    int nb_actifs, nb_passifs;
-    Actif* liste_actifs = charger_actif("liste_actifs.txt", &nb_actifs);
+    // Charger les données d'actifs et passifs depuis les fichiers
+    t_liste_actifs* liste_actifs = charger_actif("liste_actifs.txt");
+    int nb_passifs;
     char** liste_passifs = charger_passif("liste_passifs.txt", &nb_passifs);
 
-    // Exemple d'utilisation de la fonction obtenir_passifs_liés pour le premier actif (indice 0)
+    // Exemple d'utilisation de la fonction obtenir_passifs_lies pour le premier actif (indice 0)
     int nb_passifs_lies;
-    char** passifs_lies = obtenir_passifs_liés(liste_actifs, 0, &nb_passifs_lies);
+    char** passifs_lies = obtenir_passifs_lies(liste_actifs.tableau, 0, &nb_passifs_lies);
 
     // Afficher les passifs liés à l'actif ciblé
     printf("Nombre de passifs liés : %d\n", nb_passifs_lies);
@@ -190,13 +242,13 @@ void test_obtenir_passifs_lies() {
     free(passifs_lies);
 
     // Libérer la mémoire allouée pour les actifs et les passifs
-    for (int i = 0; i < nb_actifs; i++) {
-        for (int j = 0; j < liste_actifs[i].nbPassifsLies; j++) {
-            free(liste_actifs[i].PassifsLies[j]);
+    for (int i = 0; i < liste_actifs.nombre_cases; i++) {
+        for (int j = 0; j < liste_actifs.tableau[i].nbr_passifs; j++) {
+            free(liste_actifs.tableau[i].passifs_lies[j]);
         }
-        free(liste_actifs[i].PassifsLies);
+        free(liste_actifs.tableau[i].passifs_lies);
     }
-    free(liste_actifs);
+    free(liste_actifs.tableau);
 
     for (int i = 0; i < nb_passifs; i++) {
         free(liste_passifs[i]);
@@ -205,38 +257,26 @@ void test_obtenir_passifs_lies() {
 }
 
 // Fonction qui calcule la somme des dettes passives reliées à un actif
-float valeur_passifs_lier_actif(Actif *actifs, int indice_actif) {
-    float somme_passifs = 0.0;
-    
+double valeur_passifs_lier_actif(t_liste_actifs* liste_actifs, int indice_actif, t_liste_passifs* liste_passifs) {
+    double somme_passifs = 0.0;
+
     // Vérification des paramètres
-    if (actifs == NULL || indice_actif < 0) {
+    if (liste_actifs == NULL || liste_passifs == NULL || indice_actif < 0 || indice_actif >= liste_actifs->nombre_cases) {
         printf("Erreur: Paramètres invalides.\n");
         return somme_passifs;
     }
 
-    // Vérification que l'indice de l'actif est valide
-    if (indice_actif >= actifs->nb_passifs) {
-        printf("Erreur: Indice de l'actif invalide.\n");
-        return somme_passifs;
-    }
-
     // Récupération de l'actif à analyser
-    Actif actif_analyser = actifs[indice_actif];
+    t_actifs actif_analyser = liste_actifs->tableau[indice_actif];
 
     // Parcours des passifs reliés à l'actif
-    for (int i = 0; i < actif_analyser.nb_passifs; i++) {
-        // Recherche de l'indice du passif en fonction de sa description
-        int indice_passif = -1;
-        for (int j = 0; j < actif_analyser.nb_passifs; j++) {
-            if (strcmp(actif_analyser.passifs[j].description, actif_analyser.passifs[i].description) == 0) {
-                indice_passif = j;
+    for (int i = 0; i < actif_analyser.nbr_passifs; i++) {
+        // Recherche du passif dans la liste de passifs
+        for (int j = 0; j < liste_passifs->nombre_passifs; j++) {
+            if (strcmp(actif_analyser.passifs_lies[i], liste_passifs->passifs[j].id) == 0) {
+                somme_passifs += liste_passifs->passifs[j].solde;
                 break;
             }
-        }
-
-        // Si l'indice du passif est trouvé, on accumule sa valeur dans la somme
-        if (indice_passif != -1) {
-            somme_passifs += actif_analyser.passifs[indice_passif].valeur;
         }
     }
 
@@ -246,26 +286,29 @@ float valeur_passifs_lier_actif(Actif *actifs, int indice_actif) {
 // Procédure de test
 void test_valeur_passifs_lier_actif() {
     // Création des passifs
-    Passif passif1 = { "Passif 1", 100.0 };
-    Passif passif2 = { "Passif 2", 200.0 };
-    Passif passif3 = { "Passif 1", 50.0 };  // Même description que passif1
-    Passif passif4 = { "Passif 3", 300.0 };
+    t_passifs* passif1 = { "P1", "Carte credit Mastercard", 29.30 };
+    t_passifs* passif2 = { "P2", "Carte credit Visa", 1441.31 };
 
-    // Création des actifs et leurs passifs respectifs
-    Passif passifs_actif1[] = { passif1, passif2 };
-    Actif actif1 = { "Actif 1", passifs_actif1, 2 };
+    // Création de la liste de passifs
+    t_passifs* passifs[] = { passif1, passif2 };
+    t_liste_passifs* liste_passifs = { passifs, 2 };
 
-    Passif passifs_actif2[] = { passif3, passif4 };
-    Actif actif2 = { "Actif 2", passifs_actif2, 2 };
+    // Création des actifs
+    char* passifs_lies_actif1[] = { "P1" };
+    t_actifs actif1 = { "A1", 2023, "Compte Cheque", 1000.0, 0.1, 1, 1, passifs_lies_actif1 };
 
-    Actif actifs[] = { actif1, actif2 };
+    char* passifs_lies_actif2[] = { "P2" };
+    t_actifs actif2 = { "A2", 2023, "REER", 1500.0, 0.2, 2, 1, passifs_lies_actif2 };
 
-    // Test de la fonction avec l'actif1 (doit retourner 300.0)
-    float somme_passifs_actif1 = valeur_passifs_lier_actif(actifs, 0);
+    t_actifs actifs[] = { actif1, actif2 };
+    t_liste_actifs liste_actifs = { actifs, 2 };
+
+    // Test de la fonction avec l'actif1 (doit retourner 100.0)
+    double somme_passifs_actif1 = valeur_passifs_lier_actif(&liste_actifs, 0, &liste_passifs);
     printf("Somme des passifs reliés à l'actif 1 : %.2f\n", somme_passifs_actif1);
 
-    // Test de la fonction avec l'actif2 (doit retourner 350.0)
-    float somme_passifs_actif2 = valeur_passifs_lier_actif(actifs, 1);
+    // Test de la fonction avec l'actif2 (doit retourner 200.0)
+    double somme_passifs_actif2 = valeur_passifs_lier_actif(&liste_actifs, 1, &liste_passifs);
     printf("Somme des passifs reliés à l'actif 2 : %.2f\n", somme_passifs_actif2);
 }
 
