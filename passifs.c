@@ -19,16 +19,16 @@ struct t_liste_passif
 
 
 // Fonction qui compte le nombre d'éléments passifs dans une liste
-int nb_passif(liste_passif* liste_passifs)
+int nb_passif(passifs* liste_passifs)
 {
     // Vérification des cas spéciaux
-    if (liste_passif == NULL || liste_passif->elements == NULL || liste_passif->nb_elements <= 0) {
+    if (liste_passifs == NULL || liste_passifs->elements == NULL || liste_passifs->nombre_passifs <= 0) {
         return 0;
     }
 
     // Comptage du nombre d'éléments passifs
     int count = 0;
-    for (int i = 0; i < liste_passif->nb_elements; i++) {
+    for (int i = 0; i < liste_passifs->nombre_passifs; i++) {
         // Vérifier ici si l'élément à l'index i est un élément passif valide
         // Si oui, incrémenter le compteur
         // Exemple : if (valider_element_passif(liste->elements[i]))
@@ -41,15 +41,15 @@ int nb_passif(liste_passif* liste_passifs)
 // Procédure de test pour la fonction nb_passif
 void tester_nb_passif() {
     // Création d'une liste de passifs pour les tests
-    passif* passifs_test[] = {
+    passifs* passifs_test[] = {
             // Initialiser ici les éléments passifs pour les tests
             // Exemple : { "Passif 1", "Description du passif 1" },
             //           { "Passif 2", "Description du passif 2" },
     };
 
-    liste_passif liste_test;
+    liste_passifs liste_test;
     liste_test.elements = passifs_test;
-    liste_test.nb_elements = sizeof(passifs_test) / sizeof(passifs_test[0]);
+    liste_test.nombre_passifs = sizeof(passifs_test) / sizeof(passifs_test[0]);
 
     // Appel de la fonction à tester
     int resultat = nb_passif(&liste_test);
@@ -59,14 +59,15 @@ void tester_nb_passif() {
 }
 
 // Fonction pour charger les passifs à partir du fichier
-ListePassifs* charger_passif(const char* nom_fichier) {
-    FILE* fichier = fopen(nom_fichier, "r");
+liste_passifs* charger_passif(const char* nom_fichier) {
+    FILE* fichier = fopen("liste_passifs.txt", "r");
     if (fichier == NULL) {
         printf("Erreur lors de l'ouverture du fichier.\n");
         return NULL;
     }
 
-    ListePassifs* liste = (ListePassifs*)malloc(sizeof(ListePassifs));
+    // Allocation dynamique pour la structure de liste de passifs
+    t_liste_passifs* liste = (liste_passifs*)malloc(sizeof(liste_passifs));
     if (liste == NULL) {
         printf("Erreur lors de l'allocation de mémoire pour la liste.\n");
         fclose(fichier);
@@ -74,11 +75,11 @@ ListePassifs* charger_passif(const char* nom_fichier) {
     }
 
     // Lecture du nombre de passifs
-    fscanf(fichier, "nb passifs : %d", &liste->nb_passifs);
+    fscanf(fichier, "nb passifs : %d", &liste->nombre_passifs);
     fgetc(fichier); // Pour consommer le caractère '\n' restant sur la première ligne
 
     // Allocation dynamique pour le tableau de passifs
-    liste->passifs = (Passif*)malloc(liste->nb_passifs * sizeof(Passif));
+    liste->passifs = (passifs*)malloc(liste->nombre_passifs * sizeof(passifs));
     if (liste->passifs == NULL) {
         printf("Erreur lors de l'allocation de mémoire pour les passifs.\n");
         free(liste);
@@ -87,9 +88,9 @@ ListePassifs* charger_passif(const char* nom_fichier) {
     }
 
     // Lecture des données pour chaque passif
-    for (int i = 0; i < liste->nb_passifs; i++) {
-        fscanf(fichier, "%9[^,],%49[^,],%lf", liste->passifs[i].ID,
-               liste->passifs[i].Description, &liste->passifs[i].Solde);
+    for (int i = 0; i < liste->nombre_passifs; i++) {
+        fscanf(fichier, "%5[^,],%50[^,],%lf", liste->passifs[i].id,
+               liste->passifs[i].description, &liste->passifs[i].solde);
         fgetc(fichier); // Pour consommer le caractère '\n' restant sur la ligne
     }
 
@@ -97,16 +98,15 @@ ListePassifs* charger_passif(const char* nom_fichier) {
     return liste;
 }
 
-
 // Procédure de test pour afficher les passifs
 void tester_charger_passif() {
     const char* nom_fichier = "liste_passifs.txt";
-    ListePassifs* liste = charger_passif(nom_fichier);
+    liste_passifs* liste = charger_passif(nom_fichier);
     if (liste != NULL) {
-        printf("Nombre de passifs : %d\n", liste->nb_passifs);
-        for (int i = 0; i < liste->nb_passifs; i++) {
+        printf("Nombre de passifs : %d\n", liste->nombre_passifs);
+        for (int i = 0; i < liste->nombre_passifs; i++) {
             printf("ID: %s, Description: %s, Solde: %.2f\n",
-                   liste->passifs[i].ID, liste->passifs[i].Description, liste->passifs[i].Solde);
+                   liste->passifs[i].id, liste->passifs[i].description, liste->passifs[i].solde);
         }
 
         // Libérer la mémoire allouée pour la liste de passifs
