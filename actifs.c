@@ -4,6 +4,8 @@
 #include <math.h>
 #include <string.h>
 
+#define anne_actuelle 2023
+
 struct t_actifs{
     char id[6];
     int annee;
@@ -38,7 +40,7 @@ int nb_actif(liste_actifs *liste_actifs[], int taille) {
 
 
 
-
+//Fonction qui permet de charger les les actifs a partir du fichier .txt
 liste_actifs* charger_actif(const char* nom_fichier) {
     FILE* fichier = fopen(nom_fichier, "r");
     if (fichier == NULL) {
@@ -73,7 +75,90 @@ liste_actifs* charger_actif(const char* nom_fichier) {
 
 
 
-char** obtenir_passifs_liés(liste_actifs* liste_actifs, int indice_actif, int* nb_passifs_lies) {
+
+
+
+//Fonction qui obtient l'identite de l'actif desire
+char* obtenir_id_actif(liste_actifs* liste, int indice_ele_id){
+
+    if (liste == NULL || indice_ele_id < 0 || indice_ele_id >= liste->nombre_cases){
+        return 0;
+    }
+
+    return liste->tableau[indice_ele_id].id;
+
+}
+
+//Fonction qui obtient la description de l'actif desire
+char* obtenir_description_actif(liste_actifs* liste, int indice_ele_desc){
+
+    if (liste == NULL || indice_ele_desc < 0 || indice_ele_desc >= liste->nombre_cases){
+        return 0;
+    }
+    return liste->tableau[indice_ele_desc].description;
+
+}
+
+
+// Fonction pour trouver l'indice de l'actif avec l'id donné dans la liste
+int trouver_indice_actif(const liste_actifs* liste, const char* id_actif) {
+    for (int i = 0; i < liste->nombre_cases; i++) {
+        if (strcmp(liste->tableau[i].id, id_actif) == 0) {
+            return i; // Indice trouvé
+        }
+    }
+    return -1; // Indice non trouvé (valeur -1 indique l'absence de l'actif dans la liste)
+}
+
+// Fonction pour libérer la mémoire occupée par la liste d'actifs
+void detruire_liste_actif(liste_actifs* liste) {
+    for (int i = 0; i < liste->nombre_cases; i++) {
+        for (int j = 0; j < liste->tableau[i].nbr_passifs; j++) {
+            free(liste->tableau[i].passifs_lies[j]);
+        }
+        free(liste->tableau[i].passifs_lies);
+    }
+    free(liste->tableau);
+    liste->tableau = NULL;
+    liste->nombre_cases = 0;
+    free(liste);
+}
+
+
+void charger_passifs_lies(liste_actifs* liste, int indice_actif){
+
+    int nb_passifs = 0;
+    int indice = indice_actif + 2;
+    char* token;
+
+    actifs* actifs = &(liste->tableau[indice]);
+
+    actifs->passifs_lies = (char**)malloc(sizeof(char*));
+
+    token = strtok(NULL, ",");
+
+    if(token == NULL){
+        return;
+    }
+
+    while(token != NULL){
+        nb_passifs++;
+
+        actifs->passifs_lies = (char**)realloc(actifs->passifs_lies, nb_passifs * sizeof(char*));
+
+        actifs->passifs_lies[nb_passifs - 1] = (char*)malloc(strlen(token) + 1);
+        strcpy(actifs->passifs_lies[nb_passifs - 1], token);
+
+
+
+        token = strtok(NULL, ",");
+    }
+
+    actifs->nbr_passifs = nb_passifs;
+}
+
+
+char** obtenir_passifs_lies(liste_actifs* liste_actifs, int indice_actif, int* nb_passifs_lies) {
 
     // Vérifier si l'indice_actif est valide
     if (indice_actif < 0 || indice_actif >= *nb_actifs) {
@@ -112,63 +197,51 @@ char** obtenir_passifs_liés(liste_actifs* liste_actifs, int indice_actif, int* 
 }
 
 
+//Fonction qui calcul l'appreciatiom ou depreciation de l'actif
+double apprecier_deprecier_actif(liste_actifs* liste,int indice){
 
+    //Initialisation des variables utilisees
+    int age_actif;
+    int valeur = liste->tableau[indice].valeur_init;
 
-//Fonction qui obtient l'identite de l'actif desire
-char* obtenir_id_actif(liste_actifs* liste, int indice_ele_id){
+    //Calcul de l'age de l'actif
+    age_actif = liste->tableau[indice].annee - anne_actuelle;
 
-    if (liste == NULL || indice_ele_id < 0 || indice_ele_id >= liste->nombre_cases){
-        return 0;
+    //Aucune appreciation ou depreciation
+    if(liste->tableau[indice].type == 1 || liste->tableau[indice].annee == anne_actuelle){
+
+        return valeur;
     }
 
-    return liste->tableau[indice_ele_id].id;
+        //Appreciation de maniere lineaire
+    else if(liste->tableau[indice].type == 2){
+
+        valeur = valeur * (1 + liste->tableau[indice].pourcentage * age_actif);
+        return valeur;
+    }
+
+        //Appreciation de maniere exponentielle
+    else if(liste->tableau[indice].type == 3){
+
+        valeur = valeur * pow((1 + liste->tableau[indice].pourcentage), age_actif);
+        return valeur;
+    }
+
+        //Depreciation de maniere lineaire
+    else if(liste->tableau[indice].type == 4){
+
+        valeur = valeur * (1 - liste->tableau[indice].pourcentage * age_actif);
+        return valeur;
+    }
+
+        //Depreciation de maniere exponentielle
+    else if(liste->tableau[indice].type == 5){
+
+        valeur = valeur * pow((1 - liste->tableau[indice].pourcentage), age_actif);
+        return valeur;
+    }
 
 }
-
-//Fonction qui obtient la description de l'actif desire
-char* obtenir_description_actif(liste_actifs* liste, int indice_ele_desc){
-
-    if (liste == NULL || indice_ele_desc < 0 || indice_ele_desc >= liste->nombre_cases){
-        return 0;
-    }
-    return liste->tableau[indice_ele_desc].description;
-
-}
-
-
-
-void charger_passifs_lies(liste_actifs* liste, int indice_actif){
-
-    int nb_passifs = 0;
-    int indice = indice_actif + 2;
-    char* token;
-
-    actifs* actifs = &(liste->tableau[indice]);
-
-    actifs->passifs_lies = (char**)malloc(sizeof(char*));
-
-    token = strtok(NULL, ",");
-
-    if(token == NULL){
-        return;
-    }
-
-    while(token != NULL){
-        nb_passifs++;
-
-        actifs->passifs_lies = (char**)realloc(actifs->passifs_lies, nb_passifs * sizeof(char*));
-
-        actifs->passifs_lies[nb_passifs - 1] = (char*)malloc(strlen(token) + 1);
-        strcpy(actifs->passifs_lies[nb_passifs - 1], token);
-
-
-
-        token = strtok(NULL, ",");
-    }
-
-    actifs->nbr_passifs = nb_passifs;
-}
-
 
 
 float valeur_passifs_lier_actif(liste_actifs* actifs, int indice_actif) {
@@ -210,47 +283,36 @@ float valeur_passifs_lier_actif(liste_actifs* actifs, int indice_actif) {
 }
 
 
+//Fonction qui verifie si un passif est bien lie a un actif
+int passif_est_lier_a_actif(liste_actifs* liste, const char* id){
+    int valeur = 0;
 
-double apprecier_deprecier_actif(liste_actifs* liste,int indice){
+    for(int i = 0; i <  liste->nombre_cases; i++){
 
-    int age_actif;
-    int valeur = liste->tableau[indice].valeur_init;
+        if (liste->tableau[i].nbr_passifs > 0) {
 
-    age_actif = liste->tableau[indice].annee - anne_actuelle;
+            for(int j = 0; j < liste->tableau->nbr_passifs; j++){
 
-    if(liste->tableau[indice].type == 1 || liste->tableau[indice].annee == anne_actuelle){
+                if(strcmp(liste->tableau[i].passifs_lies[j], id) == 0){
+                    valeur = 1;
+                }
+            }
 
-         return valeur;
+        }
+
     }
 
-    //Appreciation de maniere lineaire
-    else if(liste->tableau[indice].type == 2){
 
-        valeur = valeur * (1 + liste->tableau[indice].pourcentage * age_actif);
-        return valeur;
-    }
+    return valeur;
+}
 
-    //Appreciation de maniere exponentielle
-    else if(liste->tableau[indice].type == 3){
 
-        valeur = valeur * pow((1 + liste->tableau[indice].pourcentage), age_actif);
-        return valeur;
-    }
 
-    //Depreciation de maniere lineaire
-    else if(liste->tableau[indice].type == 4){
 
-        valeur = valeur * (1 - liste->tableau[indice].pourcentage * age_actif);
-        return valeur;
-    }
+//Fonction pour modifier le solde de l'actif a partir du main
+void modifier_solde_actif(liste_actifs* liste, int indice, double nouv_val){
 
-    //Depreciation de maniere exponentielle
-    else if(liste->tableau[indice].type == 5){
-
-        valeur = valeur * pow((1 - liste->tableau[indice].pourcentage), age_actif);
-        return valeur;
-    }
-
+    liste->tableau[indice].valeur_init = nouv_val;
 }
 
 
