@@ -209,7 +209,41 @@ void test_enregistrer_analyser_valeur_nette() {
     // Libération de la mémoire allouée pour la liste d'équités
     free(liste_eq.tableau);
 }
+// Fonction pour obtenir la valeur nette d'une équité spécifique
+double obtenir_valeur_nette_equite(t_liste_equite* equites, int indice) {
+    if (indice < 0 || indice >= equites->nombre_equites) {
+        fprintf(stderr, "Indice d'équité invalide\n");
+        exit(EXIT_FAILURE);
+    }
+    return equites->tableau[indice].val_net;
+}
+// Fonction de test pour obtenir la valeur nette d'une équité spécifique
+void tester_obtenir_valeur_nette_equite(t_liste_equite* equites, int indice) {
+    double valeur_nette = obtenir_valeur_nette_equite(equites, indice);
+    printf("Valeur nette de l'équité à l'indice %d : %.2f\n", indice, valeur_nette);
+}
+int nb_equites(t_liste_equite* equites) {
+    return equites->nombre_equites;
+}
 
+// Fonction de test pour obtenir le nombre d'équités dans la liste
+void tester_nb_equites(t_liste_equite* equites) {
+    int nombre_equites = nb_equites(equites);
+    printf("Nombre d'équités : %d\n", nombre_equites);
+}
+
+// Fonction pour obtenir la valeur nette totale de toutes les équités
+double obtenir_valeur_nette_totale(t_liste_equite* equites) {
+    double somme = 0.0;
+    for (int i = 0; i < equites->nbr_case; i++) {
+        somme += equites->tableau[i].val_net;
+    }
+    return somme;
+}
+// Fonction de test pour obtenir la valeur nette totale
+void tester_obtenir_valeur_nette_totale(t_liste_equite* equites) {
+    double valeur_nette_totale = obtenir_valeur_nette_totale(equites);
+    printf("Valeur nette totale : %.2f\n", valeur_nette_totale);
 void test_module_equite()
 {
     
